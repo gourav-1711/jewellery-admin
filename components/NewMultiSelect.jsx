@@ -19,7 +19,7 @@ const NewMultiSelect = ({
 
   // Handle option selection
   const handleOptionToggle = (option) => {
-    const optionValue = option._id 
+    const optionValue = option._id; 
     const isSelected = categoryId.includes(optionValue);
     
     if (isSelected) {
@@ -36,7 +36,7 @@ const NewMultiSelect = ({
       const selected = category.find(item => 
         (item._id === categoryId[0])
       );
-      return selected?.name || selected?.label || selected || categoryId[0];
+      return selected?.name || selected?.label || selected?.toString() || categoryId[0];
     }
     return `${categoryId.length} items selected`;
   };
@@ -54,18 +54,23 @@ const NewMultiSelect = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Clear all selections
+  // Clear all selections handler
   const handleClearAll = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); 
     setCategoryId([]);
+  };
+
+  // Toggle dropdown handler for the main button
+  const handleMainButtonClick = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      {/* Main Select Button */}
+      {/* Main Select Button (No nested buttons) */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleMainButtonClick}
         className="w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between hover:border-gray-400 transition-colors z-[9999]"
       >
         <span className={`truncate ${categoryId.length === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
@@ -73,13 +78,15 @@ const NewMultiSelect = ({
         </span>
         <div className="flex items-center space-x-2">
           {categoryId.length > 0 && (
-            <button
+            <span
               onClick={handleClearAll}
-              className="text-gray-400 hover:text-gray-600 text-sm"
+              className="text-gray-400 hover:text-gray-600 text-sm cursor-pointer z-10 p-1 -m-1" 
               title="Clear all"
+              role="button" 
+              aria-label="Clear all selections"
             >
               ✕
-            </button>
+            </span>
           )}
           <svg
             className={`w-4 h-4 text-gray-400 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -94,7 +101,7 @@ const NewMultiSelect = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className=" z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
+        <div className=" absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
           {/* Search Input */}
           <div className="p-2 border-b border-gray-200">
             <input
@@ -102,6 +109,7 @@ const NewMultiSelect = ({
               placeholder="Search options..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoFocus
               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -111,21 +119,24 @@ const NewMultiSelect = ({
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => {
                 const optionValue = option._id;
-                const optionLabel = option.name;
+                const optionLabel = option.name || option.label || option.toString();
                 const isSelected = categoryId.includes(optionValue);
 
                 return (
                   <div
-                    key={index}
+                    key={optionValue || index}
                     onClick={() => handleOptionToggle(option)}
                     className={`px-3 py-2 cursor-pointer hover:bg-gray-100 flex items-center space-x-2 ${
                       isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-900'
                     }`}
                   >
+                    {/* CHECKBOX FIX: ADD readOnly PROP */}
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => {}}
+                      // Removed onChange={() => {}} as it was causing the "input is for show only" error
+                      readOnly // This explicitly tells React the input is not meant to be changed directly
+                      tabIndex={-1} 
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="flex-1 text-sm">{optionLabel}</span>

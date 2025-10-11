@@ -25,6 +25,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Package, label: "Products", href: "/dashboard/products" },
   { icon: Users, label: "Users", href: "/dashboard/users" },
+  { icon: ImageIcon, label: "Logos", href: "/dashboard/logos" },
   { icon: ShoppingCart, label: "Orders", href: "/dashboard/orders" },
   { icon: FolderTree, label: "Categories", href: "/dashboard/categories" },
   { icon: FolderTree, label: "Sub Categories", href: "/dashboard/sub-category" },

@@ -55,7 +55,7 @@ export function DataTable({ data, columns, onEdit, onDelete, searchPlaceholder =
           <TableBody>
             {paginatedData.map((item, rowIndex) => (
               <TableRow
-                key={item.id}
+                key={item._id}
                 className="transition-all duration-200 hover:bg-muted/50 animate-in fade-in slide-in-from-left"
                 style={{ animationDelay: `${rowIndex * 30}ms` }}
               >
@@ -75,7 +75,7 @@ export function DataTable({ data, columns, onEdit, onDelete, searchPlaceholder =
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onDelete(item.id)}
+                      onClick={() => onDelete(item._id)}
                       className="transition-all duration-200 hover:scale-110 text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />

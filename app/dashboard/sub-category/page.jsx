@@ -72,7 +72,7 @@ export default function CategoriesPage() {
   const loadCategories = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${API_BASE}api/admin/subSubCategory/view`, {
+      const response = await fetch(`${API_BASE}api/admin/subCategory/view`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({}),
@@ -112,7 +112,7 @@ export default function CategoriesPage() {
     if (!categoryToDelete) return
 
     try {
-      const response = await fetch(`${API_BASE}api/admin/subSubCategory/delete/${categoryToDelete}`, {
+      const response = await fetch(`${API_BASE}api/admin/subCategory/delete/${categoryToDelete}`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ id: categoryToDelete }),
@@ -157,7 +157,7 @@ export default function CategoriesPage() {
 
 
       if (editingCategory) {
-        const response = await fetch(`${API_BASE}api/admin/subSubCategory/update/${editingCategory._id}`, {
+        const response = await fetch(`${API_BASE}api/admin/subCategory/update/${editingCategory._id}`, {
           method: "PUT",
           headers: getAuthHeadersFormData(),
           body: submitData,
@@ -170,7 +170,7 @@ export default function CategoriesPage() {
         
         toast({ title: "Category updated successfully" })
       } else {
-        const response = await fetch(`${API_BASE}api/admin/subSubCategory/create`, {
+        const response = await fetch(`${API_BASE}api/admin/subCategory/create`, {
           method: "POST",
           headers: getAuthHeadersFormData(),
           body: submitData,
@@ -202,7 +202,7 @@ export default function CategoriesPage() {
   const handleChangeStatus = async (category) => {
     try {
      
-      const response = await fetch(`${API_BASE}api/admin/subSubCategory/change-status/${category._id}`, {
+      const response = await fetch(`${API_BASE}api/admin/subCategory/change-status/${category._id}`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ id: category._id }),
