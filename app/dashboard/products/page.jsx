@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/data-table";
 import { Drawer } from "@/components/drawer";
 import { ExportButtons } from "@/components/export-buttons";
-import { AlertDialog } from "@/components/alert-dialog";
+import { AlertDialogUse } from "@/components/alert-dialog";
 import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import NewMultiSelect from "../../../components/NewMultiSelect";
@@ -871,7 +871,7 @@ export default function ProductsPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={alertOpen}
         onClose={() => setAlertOpen(false)}
         onConfirm={confirmDelete}

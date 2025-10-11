@@ -23,7 +23,7 @@ export function Drawer({ isOpen, onClose, title, children, className }) {
     <>
       <div
         className={cn(
-          "fixed inset-0 bg-background/80 backdrop-blur-sm z-50 transition-opacity duration-300",
+          "fixed inset-0 bg-background/80 backdrop-blur-sm z-50 transition-opacity duration-300 ",
           isOpen ? "opacity-100" : "opacity-0",
           className 
         )}
@@ -32,7 +32,7 @@ export function Drawer({ isOpen, onClose, title, children, className }) {
 
       <div
         className={cn(
-          "fixed right-0 top-0 h-screen w-full max-w-md bg-card border-l border-border z-50 shadow-2xl transition-transform duration-300 overflow-scroll",
+          "fixed right-0 top-0 h-screen w-full max-w-md bg-card border-l border-border z-50 shadow-2xl transition-transform duration-300 overflow-scroll ",
           isOpen ? "translate-x-0" : "translate-x-full",
           className
         )}

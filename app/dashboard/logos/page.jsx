@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Drawer } from "@/components/drawer";
-import { AlertDialog } from "@/components/alert-dialog";
+import { AlertDialogUse } from "@/components/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -358,7 +358,7 @@ export default function LogosPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

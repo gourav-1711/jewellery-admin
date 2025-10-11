@@ -1,194 +1,201 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Drawer } from "@/components/drawer"
-import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
-import { Plus, Edit, Trash2, FolderTree } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import Cookies from "js-cookie"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Drawer } from "@/components/drawer";
+import { ExportButtons } from "@/components/export-buttons";
+import { AlertDialogUse } from "@/components/alert-dialog";
+import { Plus, Edit, Trash2, FolderTree } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import Cookies from "js-cookie";
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const getAuthHeaders = () => ({
   "Content-Type": "application/json",
   Authorization: `Bearer ${Cookies.get("adminToken")}`,
-})
+});
 
 const getAuthHeadersFormData = () => ({
   Authorization: `Bearer ${Cookies.get("adminToken")}`,
-})
+});
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState(null)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [categoryToDelete, setCategoryToDelete] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     image: null,
-  })
-  const { toast } = useToast()
+  });
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadCategories()
-  }, [])
+    loadCategories();
+  }, []);
 
   const loadCategories = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE}api/admin/category/view`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({}),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(response._message)
+        throw new Error("Error loading categories");
       }
 
-      const data = await response.json()
-      setCategories(data._data || data)
+      const data = await response.json();
+      setCategories(data._data || data);
     } catch (error) {
-      console.error("Error loading categories:", error)
-      toast({ title: "Error loading categories", variant: "destructive" })
+      console.error("Error loading categories:", error);
+      toast({ title: "Error loading categories", variant: "destructive" });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleEdit = (category) => {
-    setEditingCategory(category)
+    setEditingCategory(category);
     setFormData({
       name: category.name,
       image: null,
-    })
-    setImagePreview(category.image || null)
-    setDrawerOpen(true)
-  }
+    });
+    setImagePreview(category.image || null);
+    setDrawerOpen(true);
+  };
 
   const handleDelete = async (id) => {
-    setCategoryToDelete(id)
-    setDeleteDialogOpen(true)
-  }
+    setCategoryToDelete(id);
+    setDeleteDialogOpen(true);
+  };
 
   const confirmDelete = async () => {
-    if (!categoryToDelete) return
+    if (!categoryToDelete) return;
 
     try {
-      const response = await fetch(`${API_BASE}api/admin/category/delete/${categoryToDelete}`, {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ id: categoryToDelete }),
-      })
+      const response = await fetch(
+        `${API_BASE}api/admin/category/delete/${categoryToDelete}`,
+        {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id: categoryToDelete }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(response._message)
+        throw new Error("Error deleting category");
       }
 
-      toast({ title: "Category deleted successfully" })
+      toast({ title: "Category deleted successfully" });
+      loadCategories();
     } catch (error) {
-      console.error("Error deleting category:", error)
-      toast({ title: "Error deleting category", variant: "destructive" })
+      console.error("Error deleting category:", error);
+      toast({ title: "Error deleting category", variant: "destructive" });
     } finally {
-      setDeleteDialogOpen(false)
-      setCategoryToDelete(null)
+      setDeleteDialogOpen(false);
+      setCategoryToDelete(null);
     }
-  }
+  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setFormData({ ...formData, image: file })
-      const reader = new FileReader()
+      setFormData({ ...formData, image: file });
+      const reader = new FileReader();
       reader.onload = (event) => {
-        setImagePreview(event.target?.result)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(event.target?.result);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      const submitData = new FormData()
-      submitData.append("name", formData.name)
+      const submitData = new FormData();
+      submitData.append("name", formData.name);
       if (formData.image instanceof File) {
-        submitData.append("image", formData.image)
+        submitData.append("image", formData.image);
       }
 
       if (editingCategory) {
-        const response = await fetch(`${API_BASE}api/admin/category/update/${editingCategory._id}`, {
-          method: "PUT",
-          headers: getAuthHeadersFormData(),
-          body: submitData,
-        })
+        const response = await fetch(
+          `${API_BASE}api/admin/category/update/${editingCategory._id}`,
+          {
+            method: "PUT",
+            headers: getAuthHeadersFormData(),
+            body: submitData,
+          }
+        );
 
-        if (!response.ok) {
-          throw new Error(response._message)
+        if (!response.ok || !response._status) {
+          throw new Error("Error updating category");
         }
 
-        
-        toast({ title: "Category updated successfully" })
+        toast({ title: "Category updated successfully" });
+        loadCategories();
       } else {
         const response = await fetch(`${API_BASE}api/admin/category/create`, {
           method: "POST",
           headers: getAuthHeadersFormData(),
           body: submitData,
-        })
+        });
 
-        if (!response._status) {
-          throw new Error(response._message)
+        if (!response.ok || !response._status) {
+          throw new Error("Error creating category");
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
-       
-        toast({ title: "Category created successfully" })
+        toast({ title: "Category created successfully" });
+        loadCategories();
       }
 
-      setDrawerOpen(false)
-      setEditingCategory(null)
-      setFormData({ name: "", image: null })
-      setImagePreview(null)
+      setDrawerOpen(false);
+      setEditingCategory(null);
     } catch (error) {
-      console.error("Error saving category:", error)
+      console.error("Error saving category:", error);
       toast({
-        title: editingCategory ? "Error updating category" : "Error creating category",
+        title: error.message || error._message || "Error saving category",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleChangeStatus = async (category) => {
     try {
-     
-      const response = await fetch(`${API_BASE}api/admin/category/change-status/${category._id}`, {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ id: category._id }),
-      })
+      const response = await fetch(
+        `${API_BASE}api/admin/category/change-status/${category._id}`,
+        {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id: category._id }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(response._message)
+      if (!response.ok ) {
+        throw new Error( "Error changing status");
       }
 
-      
-      toast({ title: `Category status changed ` })
+      toast({ title: `Category status changed ` });
+      loadCategories();
     } catch (error) {
-      console.error("Error changing status:", error)
-      toast({ title: "Error changing status", variant: "destructive" })
+      console.error("Error changing status:", error);
+      toast({ title: "Error changing status", variant: "destructive" });
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -202,7 +209,7 @@ export default function CategoriesPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -210,16 +217,18 @@ export default function CategoriesPage() {
       <div className="flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
-          <p className="text-muted-foreground">Organize your products into categories</p>
+          <p className="text-muted-foreground">
+            Organize your products into categories
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <ExportButtons data={categories} filename="categories" />
           <Button
             onClick={() => {
-              setEditingCategory(null)
-              setFormData({ name: "", image: null })
-              setImagePreview(null)
-              setDrawerOpen(true)
+              setEditingCategory(null);
+              setFormData({ name: "", image: null });
+              setImagePreview(null);
+              setDrawerOpen(true);
             }}
             className="transition-all duration-200 hover:scale-105"
           >
@@ -250,8 +259,9 @@ export default function CategoriesPage() {
                       <FolderTree className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-card-foreground">{category.name}</h3>
-                     
+                      <h3 className="font-semibold text-card-foreground">
+                        {category.name}
+                      </h3>
                     </div>
                   </div>
                 </div>
@@ -314,7 +324,9 @@ export default function CategoriesPage() {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
             />
           </div>
@@ -337,8 +349,8 @@ export default function CategoriesPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setImagePreview(null)
-                    setFormData({ ...formData, image: null })
+                    setImagePreview(null);
+                    setFormData({ ...formData, image: null });
                   }}
                   className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
                 >
@@ -357,7 +369,7 @@ export default function CategoriesPage() {
         </div>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
@@ -365,5 +377,5 @@ export default function CategoriesPage() {
         description="Are you sure you want to delete this category? This action cannot be undone."
       />
     </div>
-  )
+  );
 }

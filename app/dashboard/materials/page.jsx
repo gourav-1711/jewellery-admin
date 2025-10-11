@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Drawer } from "@/components/drawer";
 import { ExportButtons } from "@/components/export-buttons";
-import { AlertDialog } from "@/components/alert-dialog";
+import { AlertDialogUse } from "@/components/alert-dialog";
 import { Plus, Pencil, Trash2, Palette, Package } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -75,8 +75,7 @@ export default function MaterialsColorsPage() {
       ]);
       setMaterials(materialsResponse.data._data || []);
       setColors(colorsResponse.data._data || []);
-      console.log(materialsResponse.data._data);
-      console.log(colorsResponse.data._data);
+      
     } catch (error) {
       toast({
         title: "Error loading data",
@@ -167,11 +166,6 @@ export default function MaterialsColorsPage() {
         );
 
         if (response.data._status) {
-          setMaterials(
-            materials.map((m) =>
-              m._id === editingItem._id ? { ...m, ...materialForm } : m
-            )
-          );
           toast({ title: "Material updated successfully" });
         } else {
           toast({
@@ -188,7 +182,6 @@ export default function MaterialsColorsPage() {
         );
 
         if (response.data._status) {
-          setMaterials([...materials, response.data._data]);
           toast({ title: "Material created successfully" });
         } else {
           toast({
@@ -228,11 +221,8 @@ export default function MaterialsColorsPage() {
         );
 
         if (response.data._status) {
-          setColors(
-            colors.map((c) =>
-              c._id === editingItem._id ? { ...c, ...colorForm } : c
-            )
-          );
+          
+        
           toast({ title: "Color updated successfully" });
         } else {
           toast({
@@ -254,7 +244,6 @@ export default function MaterialsColorsPage() {
         );
 
         if (response.data._status) {
-          setColors([...colors, response.data.data]);
           toast({ title: "Color created successfully" });
         } else {
           toast({
@@ -286,11 +275,6 @@ export default function MaterialsColorsPage() {
       );
 
       if (response.data._status) {
-        setColors(
-          colors.map((c) =>
-            c._id === color._id ? { ...c, status: !color.status } : c
-          )
-        );
         toast({ title: "Color status updated successfully" });
       } else {
         toast({
@@ -317,11 +301,6 @@ export default function MaterialsColorsPage() {
       );
 
       if (response.data._status) {
-        setMaterials(
-          materials.map((m) =>
-            m._id === material._id ? { ...m, status: !material.status } : m
-          )
-        );
         toast({ title: "Material status updated successfully" });
       } else {
         toast({
@@ -671,7 +650,7 @@ export default function MaterialsColorsPage() {
         )}
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

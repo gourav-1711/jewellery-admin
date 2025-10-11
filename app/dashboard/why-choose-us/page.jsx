@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer } from "@/components/drawer"
 import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
+import { AlertDialogUse } from "@/components/alert-dialog"
 import { Plus, Pencil, Trash2, Truck, Star, Headset, Shield } from "lucide-react"
 import { fetchData, createItem, updateItem, deleteItem } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -252,7 +252,7 @@ export default function WhyChooseUsPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

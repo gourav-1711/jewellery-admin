@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DataTable } from "@/components/data-table"
 import { Drawer } from "@/components/drawer"
 import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
+import { AlertDialogUse } from "@/components/alert-dialog"
 import { Plus } from "lucide-react"
 import { fetchData, createItem, updateItem, deleteItem } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -228,7 +228,7 @@ export default function UsersPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

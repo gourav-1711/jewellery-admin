@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Drawer } from "@/components/drawer"
 import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
+import { AlertDialogUse } from "@/components/alert-dialog"
 import { Plus, Pencil, Trash2, Star } from "lucide-react"
 import { fetchData, createItem, updateItem, deleteItem } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -273,7 +273,7 @@ export default function TestimonialsPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

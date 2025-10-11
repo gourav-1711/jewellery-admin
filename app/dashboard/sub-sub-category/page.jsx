@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Drawer } from "@/components/drawer";
 import { ExportButtons } from "@/components/export-buttons";
-import { AlertDialog } from "@/components/alert-dialog";
+import { AlertDialogUse } from "@/components/alert-dialog";
 import { Plus, Edit, Trash2, FolderTree } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
       });
 
       if (!response.ok) {
-        throw new Error(response._message);
+        throw new Error("Failed to load sub categories");
       }
 
       const data = await response.json();
@@ -79,7 +79,7 @@ export default function CategoriesPage() {
       });
 
       if (!response.ok) {
-        throw new Error(response._message);
+        throw new Error("Failed to load categories");
       }
 
       const data = await response.json();
@@ -127,7 +127,7 @@ export default function CategoriesPage() {
       );
 
       if (!response.ok) {
-        throw new Error(response._message);
+        throw new Error("Failed to delete category");
       }
 
       toast({ title: "Category deleted successfully" });
@@ -174,7 +174,7 @@ export default function CategoriesPage() {
         );
 
         if (!response.ok) {
-          throw new Error(response._message);
+          throw new Error("Failed to update category");
         }
 
         toast({ title: "Category updated successfully" });
@@ -189,7 +189,7 @@ export default function CategoriesPage() {
         );
 
         if (!response.ok) {
-          throw new Error(response._message);
+          throw new Error("Failed to create category");
         }
 
         const data = await response.json();
@@ -224,7 +224,7 @@ export default function CategoriesPage() {
       );
 
       if (!response.ok) {
-        throw new Error(response._message);
+        throw new Error("Failed to change status");
       }
 
       toast({ title: `Category status changed ` });
@@ -417,7 +417,7 @@ export default function CategoriesPage() {
         </div>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

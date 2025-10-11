@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Drawer } from "@/components/drawer"
 import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
+import { AlertDialogUse } from "@/components/alert-dialog"
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -86,7 +86,7 @@ export default function FAQsPage() {
         { id: faqToDelete },
         { headers: getAuthHeaders() }
       )
-      setFaqs(faqs.filter((f) => f._id !== faqToDelete))
+      loadFaqs()
       toast({ title: "FAQ deleted successfully" })
     } catch (error) {
       toast({
@@ -109,11 +109,7 @@ export default function FAQsPage() {
       )
 
       if (response.data._status) {
-        setFaqs(
-          faqs.map((f) =>
-            f._id === faq._id ? { ...f, status: !faq.status } : f
-          )
-        )
+        loadFaqs()
         toast({ title: "FAQ status updated successfully" })
       } else {
         toast({
@@ -142,7 +138,7 @@ export default function FAQsPage() {
         )
 
         if (response.data._status) {
-          setFaqs(faqs.map((f) => (f._id === editingFaq._id ? { ...f, ...formData } : f)))
+          loadFaqs()
           toast({ title: "FAQ updated successfully" })
         } else {
           toast({
@@ -159,7 +155,7 @@ export default function FAQsPage() {
         )
 
         if (response.data._status) {
-          setFaqs([...faqs, response.data._data])
+          loadFaqs()
           toast({ title: "FAQ created successfully" })
         } else {
           toast({
@@ -287,7 +283,7 @@ export default function FAQsPage() {
         </Accordion>
       </div>
 
-      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingFaq ? "Edit FAQ" : "Add FAQ"} className="h-full">
+      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingFaq ? "Edit FAQ" : "Add FAQ"} className="h-screen">
         <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto h-full pb-20">
           <div className="space-y-2 animate-in slide-in-from-right duration-300">
             <Label htmlFor="question">Question</Label>
@@ -328,7 +324,7 @@ export default function FAQsPage() {
         </form>
       </Drawer>
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}

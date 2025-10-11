@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/data-table"
 import { ExportButtons } from "@/components/export-buttons"
-import { AlertDialog } from "@/components/alert-dialog"
+import { AlertDialogUse } from "@/components/alert-dialog"
 import { OrderReceipt } from "@/components/order-receipt"
 import { Package, Clock, Truck, CheckCircle, Printer } from "lucide-react"
 import { fetchData, deleteItem } from "@/lib/api"
@@ -173,7 +173,7 @@ export default function OrdersPage() {
         searchPlaceholder="Search orders..."
       />
 
-      <AlertDialog
+      <AlertDialogUse
         isOpen={alertOpen}
         onClose={() => setAlertOpen(false)}
         onConfirm={confirmDelete}
