@@ -60,9 +60,9 @@ export function Sidebar({ onCollapsedChange }) {
           {!collapsed && (
             <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left duration-300">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">A</span>
+                <span className="text-primary-foreground font-bold text-sm">J</span>
               </div>
-              <span className="font-bold text-lg text-sidebar-foreground">Admin</span>
+              <span className="font-bold text-lg text-sidebar-foreground">Jewellery Walla</span>
             </div>
           )}
           <Button
@@ -75,7 +75,7 @@ export function Sidebar({ onCollapsedChange }) {
           </Button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-2 space-y-1 no-scroll">
           {menuItems.map((item, index) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -88,7 +88,7 @@ export function Sidebar({ onCollapsedChange }) {
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                   "hover:bg-sidebar-accent hover:scale-[1.02] hover:translate-x-1",
                   "animate-in slide-in-from-left duration-300",
-                  isActive && "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02]",
+                  isActive && "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02] hover:bg-sidebar-primary",
                   !isActive && "text-sidebar-foreground",
                 )}
                 style={{ animationDelay: `${index * 30}ms` }}

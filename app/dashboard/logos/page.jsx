@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,6 @@ import axios from "axios";
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const getAuthHeaders = () => ({
-
   Authorization: `Bearer ${Cookies.get("adminToken")}`,
 });
 
@@ -32,6 +32,7 @@ const getAuthHeadersFormData = () => ({
 });
 
 export default function LogosPage() {
+  const [btnLoading, setBtnLoading] = useState(false);
   const [logos, setLogos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -40,9 +41,7 @@ export default function LogosPage() {
   const [logoToDelete, setLogoToDelete] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({
-   
     image: null,
-    
   });
   const { toast } = useToast();
 
@@ -94,12 +93,11 @@ export default function LogosPage() {
     e.preventDefault();
 
     const submitData = new FormData();
-   
-    if (formData.image instanceof File) {
-      submitData.append("logo", formData.image);
-    }
+
+    submitData.append("logo", formData.image);
 
     try {
+      setBtnLoading(true);
       if (editingLogo) {
         await axios.put(
           `${API_BASE}api/admin/logo/update/${editingLogo._id}`,
@@ -122,6 +120,8 @@ export default function LogosPage() {
         description: error.response?.data?._message || "An error occurred",
         variant: "destructive",
       });
+    } finally {
+      setBtnLoading(false);
     }
   };
 
@@ -144,11 +144,11 @@ export default function LogosPage() {
 
     try {
       await axios.put(
-        `${API_BASE}api/admin/logo/delete`,
+        `${API_BASE}api/admin/logo/destroy`,
         { id: logoToDelete },
         { headers: getAuthHeaders() }
       );
-      setLogos(logos.filter((logo) => logo._id !== logoToDelete));
+      loadLogos();
       toast({ title: "Logo deleted successfully" });
     } catch (error) {
       toast({
@@ -164,16 +164,12 @@ export default function LogosPage() {
 
   const toggleStatus = async (logo) => {
     try {
-      await axios.put(
-        `${API_BASE}api/admin/logo/change-status/${logo._id}`,
-        { isActive: !logo.isActive },
+      await axios.post(
+        `${API_BASE}api/admin/logo/change-status`,
+        { id: logo._id },
         { headers: getAuthHeaders() }
       );
-      setLogos(
-        logos.map((l) =>
-          l._id === logo._id ? { ...l, isActive: !l.isActive } : l
-        )
-      );
+      loadLogos();
       toast({
         title: `Logo ${
           logo.isActive ? "deactivated" : "activated"
@@ -234,13 +230,17 @@ export default function LogosPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {logos.map((logo) => (
-            <Card key={logo._id} className="overflow-hidden">
+          {logos.map((logo, index) => (
+            <Card
+              key={logo._id}
+              style={{ animationDelay: `${index * 100}ms` }}
+              className="overflow-hidden animate-in slide-in-from-bottom duration-300 delay-200"
+            >
               <div className="relative group">
                 <div className="aspect-square bg-muted/50 flex items-center justify-center p-4">
                   <img
-                    src={logo.image}
-                    alt={logo.name}
+                    src={logo.logo}
+                    alt={logo.logo}
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -277,14 +277,10 @@ export default function LogosPage() {
               </div>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium">{logo.name}</h3>
-                  <Badge variant={logo.isActive ? "default" : "secondary"}>
-                    {logo.isActive ? "Active" : "Inactive"}
+                  <Badge variant={logo.status ? "default" : "secondary"}>
+                    {logo.status ? "Active" : "Inactive"}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Order: {logo.order}
-                </p>
               </CardContent>
             </Card>
           ))}
@@ -302,8 +298,6 @@ export default function LogosPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            
-
             <div className="space-y-2">
               <Label>Logo Image *</Label>
               <div className="flex items-center justify-center w-full">
@@ -336,8 +330,6 @@ export default function LogosPage() {
                 </label>
               </div>
             </div>
-
-          
           </div>
 
           <div className="flex justify-end space-x-4 pt-4 border-t">
@@ -351,8 +343,16 @@ export default function LogosPage() {
             >
               Cancel
             </Button>
-            <Button type="submit">
-              {editingLogo ? "Update Logo" : "Add Logo"}
+            <Button disabled={btnLoading} type="submit">
+              {btnLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading...
+                </>
+              ) : editingLogo ? (
+                "Update Logo"
+              ) : (
+                "Add Logo"
+              )}
             </Button>
           </div>
         </form>
