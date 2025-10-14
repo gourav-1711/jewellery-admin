@@ -22,6 +22,7 @@ export function Header() {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  const [bar, setBar] = useState(false);
   const [result, setResult] = useState([]);
   const [query, setQuery] = useState("");
 
@@ -45,9 +46,11 @@ export function Header() {
   const getSearchResult = (e) => {
     const query = e.target.value;
     setQuery(query);
+    setBar(true);
 
     if (query.trim() === "") {
       setResult([]);
+      setBar(false);
       return;
     }
 
@@ -73,11 +76,12 @@ export function Header() {
               placeholder="Search..."
               className="pl-10 transition-all duration-200 focus:scale-[1.02]"
             />
-            {result.length > 0 && (
+            {bar && result.length > 0 && (
               <ul className="absolute z-10 bg-white border rounded-md mt-1 w-full shadow-md">
                 {result.map((item, i) => (
                   <li key={i} className="border-b-1">
                     <Link
+                      onClick={() => setBar(false) }
                       href={item.href}
                       className=" px-4 py-2 hover:bg-gray-100 flex justify-between items-center"
                     >
