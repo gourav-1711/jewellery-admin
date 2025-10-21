@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
 import { Loader2, Mail } from "lucide-react";
 
 export default function VerifyEmailPage() {
+  const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
@@ -31,7 +32,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if (!email) {
-      router.push("/profile");
+      router.push("/dashboard/profile");
       return;
     }
 
@@ -50,7 +51,7 @@ export default function VerifyEmailPage() {
 
     setIsLoading(true);
     try {
-      const token = Cookies.get("user");
+      const token = Cookies.get("adminToken");
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL + "api/website/user/complete-verify",
         {
@@ -73,7 +74,7 @@ export default function VerifyEmailPage() {
       const data = await response.json();
       if (data._status === true) {
         toast.success(data._message);
-        router.push("/profile");
+        router.push("/dashboard/profile");
       }
     } catch (error) {
       console.error("Verification error:", error);
@@ -88,7 +89,7 @@ export default function VerifyEmailPage() {
 
     setIsResending(true);
     try {
-      const token = Cookies.get("user");
+      const token = Cookies.get("adminToken");
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL + "api/website/user/verify-user",
         {

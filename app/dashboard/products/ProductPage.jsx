@@ -270,8 +270,8 @@ export default function ProductsPage() {
         : []
     );
     setSelectedMaterials(
-      Array.isArray(defaultProduct.materials)
-        ? defaultProduct.materials
+      Array.isArray(defaultProduct.material)
+        ? defaultProduct.material
             .map((item) => item._id || item)
             .filter(Boolean)
         : []

@@ -10,26 +10,16 @@ import {
   Key,
   LogOut,
 } from "lucide-react";
-import { useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+
 import {
   Sheet,
   SheetContent,
@@ -63,7 +53,7 @@ function PasswordOptionsDialog({ open, onOpenChange, onOptionSelect }) {
             <Lock className="h-4 w-4" />
             <span>Change Password</span>
           </Button>
-          <Link href="/reset-password">
+          <Link href="/dashboard/reset-password">
             <Button
               variant="outline"
               className="justify-start gap-2 text-amber-600 hover:text-amber-700"
@@ -92,7 +82,7 @@ function PasswordFormSheet({ open, onOpenChange, type = "change" }) {
     setIsLoading(true);
     // Handle password change logic here
     try {
-      const token = Cookies.get("user");
+      const token = Cookies.get("adminToken");
       const response = await fetch(
         process.env.NEXT_PUBLIC_BACKEND_URL +
           "api/website/user/change-password",
@@ -217,7 +207,7 @@ export default function SettingsSection({ data }) {
   const handleVerifyClick = async (type) => {
     if (type === "email") {
       try {
-        const token = Cookies.get("user");
+        const token = Cookies.get("adminToken");
         const response = await fetch(
           process.env.NEXT_PUBLIC_BACKEND_URL + "api/website/user/verify-user",
           {
@@ -244,7 +234,7 @@ export default function SettingsSection({ data }) {
           Cookies.set("verify", resData._token, {
             expires: new Date(Date.now() + 10 * 60 * 1000),
           });
-          router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+          router.push(`dashboard/verify-email?email=${encodeURIComponent(data.email)}`);
         }
       } catch (error) {
         console.error(error);
@@ -260,11 +250,7 @@ export default function SettingsSection({ data }) {
     }
   };
 
-  // Handle logout
-  const handleLogout = async () => {
-    router.push("/");
-  };
-
+ 
   return (
     <div className="space-y-6">
       {/* Security Section */}
@@ -321,16 +307,7 @@ export default function SettingsSection({ data }) {
           <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-amber-600 transition-colors" />
         </button>
 
-        {/* Logout Button */}
-        <div className="pt-4 border-t border-gray-200">
-          <Button
-            onClick={() => setShowLogoutDialog(true)}
-            className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium transition-colors duration-300 bg-white border-red-600 hover:bg-red-600/20"
-          >
-            <LogOut className="h-5 w-5" />
-            Sign Out
-          </Button>
-        </div>
+       
         <PasswordOptionsDialog
           open={showPasswordOptions}
           onOpenChange={setShowPasswordOptions}
@@ -339,7 +316,7 @@ export default function SettingsSection({ data }) {
               setShowPasswordOptions(false);
               setShowPasswordForm(true);
             } else {
-              router.push("/reset-password");
+              router.push("/dashboard/reset-password");
             }
           }}
         />
@@ -349,28 +326,7 @@ export default function SettingsSection({ data }) {
           type={"change"}
         />
 
-        {/* Logout Confirmation Dialog */}
-        <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you sure you want to sign out?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                You'll need to sign in again to access your account.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Sign Out
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+     
       </div>
     </div>
   );

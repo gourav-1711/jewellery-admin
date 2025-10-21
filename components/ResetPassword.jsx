@@ -19,14 +19,68 @@ export default function ResetPassword() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(Array(6).fill(""));
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState("request");
 
-  const token = Cookies.get("user");
+  const token = Cookies.get("adminToken");
   const returnTo = searchParams.get("returnTo");
+
+  const handleOtpChange = (index, value) => {
+    if (isNaN(value)) return; // Only allow numbers
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value !== "" && index < 5) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    const otpCode = otp.join("");
+    if (otpCode.length === 6) {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          process.env.NEXT_PUBLIC_BACKEND_URL + "api/website/user/verify-otp",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ otp: otpCode }),
+          }
+        );
+        const data = await res.json();
+        if (data._status === true && data._token) {
+          Cookies.set("resetToken", data._token, { expires: 1 });
+          setStep("reset");
+          toast({
+            title: "Success",
+            description: "Verification code sent to your email",
+          });
+        }
+      } catch (error) {
+        console.error("Reset request error:", error);
+        toast({
+          title: "Error",
+          description:
+            error.message || "Failed to send reset link. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error("Please enter a valid 6-digit code");
+    }
+  };
 
   const handleRequestReset = async (e) => {
     e.preventDefault();
@@ -59,13 +113,18 @@ export default function ResetPassword() {
       if (data._status === true) {
         Cookies.set("resetToken", data._token, { expires: 1 });
         setStep("otp");
-        toast.success("Verification code sent to your email");
+        toast({
+          title: "Success",
+          description: "Verification code sent to your email",
+        });
       }
     } catch (error) {
       console.error("Reset request error:", error);
-      toast.error(
-        error.message || "Failed to send reset link. Please try again."
-      );
+      toast({
+        title: "Error",
+        description:
+          error.message || "Failed to send reset link. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -96,20 +155,27 @@ export default function ResetPassword() {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to reset password. Please try again.");
-      }
-
       const data = await response.json();
+      if (!response.ok || data._status === false) {
+        toast({
+          title: "Error",
+          description: "Failed to reset password. Please try again.",
+        });
+      }
       if (data._status === true) {
-        toast.success("Password reset successfully! ");
+        toast({
+          title: "Success",
+          description: "Password reset successfully!",
+        });
         router.push(returnTo || "/");
       }
     } catch (error) {
       console.error("Reset password error:", error);
-      toast.error(
-        error.message || "Failed to reset password. Please try again."
-      );
+      toast({
+        title: "Error",
+        description:
+          error.message || "Failed to reset password. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -161,13 +227,7 @@ export default function ResetPassword() {
               </Button>
             </form>
           ) : step === "otp" ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setStep("reset");
-              }}
-              className="space-y-4"
-            >
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Enter verification code
@@ -176,10 +236,18 @@ export default function ResetPassword() {
                   {otp.map((digit, i) => (
                     <Input
                       key={i}
+                      id={`otp-${i}`}
                       type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Backspace" && !digit && i > 0) {
+                          document.getElementById(`otp-${i - 1}`)?.focus();
+                        }
+                      }}
                       className="h-12 w-12 text-center text-lg"
                     />
                   ))}
