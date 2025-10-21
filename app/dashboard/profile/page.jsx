@@ -1,6 +1,6 @@
-import SettingsSection from "@/components/SettingsSection";
+import React from "react";
 import { cookies } from "next/headers";
-
+import Profile from "./Profile";
 async function getDetails() {
   const cookie = await cookies();
   const token = cookie.get("adminToken");
@@ -24,7 +24,7 @@ async function getDetails() {
   }
   return data._data;
 }
-
-export default async function SettingsPage() {
-  return <SettingsSection data={await getDetails()} />;
+export default async function page() {
+  const details = await getDetails();
+  return <Profile details={details} />;
 }

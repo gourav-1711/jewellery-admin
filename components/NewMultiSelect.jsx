@@ -10,35 +10,39 @@ const NewMultiSelect = ({
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
 
+  // Ensure category is always an array
+  const safeCategory = Array.isArray(category) ? category : [];
+  const safeCategoryId = Array.isArray(categoryId) ? categoryId : [];
+
   // Filter options based on search term
-  const filteredOptions = category.filter(option =>
-    option.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = safeCategory.filter(option =>
+    option?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    option?.label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    option?.toString().toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Handle option selection
   const handleOptionToggle = (option) => {
     const optionValue = option._id; 
-    const isSelected = categoryId.includes(optionValue);
+    const isSelected = safeCategoryId.includes(optionValue);
     
     if (isSelected) {
-      setCategoryId(categoryId.filter(id => id !== optionValue));
+      setCategoryId(safeCategoryId.filter(id => id !== optionValue));
     } else {
-      setCategoryId([...categoryId, optionValue]);
+      setCategoryId([...safeCategoryId, optionValue]);
     }
   };
 
   // Get display text for selected items
   const getSelectedText = () => {
-    if (categoryId.length === 0) return placeholder;
-    if (categoryId.length === 1) {
-      const selected = category.find(item => 
-        (item._id === categoryId[0])
+    if (safeCategoryId.length === 0) return placeholder;
+    if (safeCategoryId.length === 1) {
+      const selected = safeCategory.find(item => 
+        (item?._id === safeCategoryId[0])
       );
-      return selected?.name || selected?.label || selected?.toString() || categoryId[0];
+      return selected?.name || selected?.label || selected?.toString() || safeCategoryId[0];
     }
-    return `${categoryId.length} items selected`;
+    return `${safeCategoryId.length} items selected`;
   };
 
   // Close dropdown when clicking outside
@@ -73,11 +77,11 @@ const NewMultiSelect = ({
         onClick={handleMainButtonClick}
         className="w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between hover:border-gray-400 transition-colors z-[9999]"
       >
-        <span className={`truncate ${categoryId.length === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
+        <span className={`truncate ${safeCategoryId.length === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
           {getSelectedText()}
         </span>
         <div className="flex items-center space-x-2">
-          {categoryId.length > 0 && (
+          {safeCategoryId.length > 0 && (
             <span
               onClick={handleClearAll}
               className="text-gray-400 hover:text-gray-600 text-sm cursor-pointer z-10 p-1 -m-1" 
@@ -118,9 +122,9 @@ const NewMultiSelect = ({
           <div className="overflow-y-auto max-h-40">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => {
-                const optionValue = option._id;
-                const optionLabel = option.name || option.label || option.toString();
-                const isSelected = categoryId.includes(optionValue);
+                const optionValue = option?._id;
+                const optionLabel = option?.name || option?.label || option?.toString();
+                const isSelected = safeCategoryId.includes(optionValue);
 
                 return (
                   <div
@@ -134,8 +138,7 @@ const NewMultiSelect = ({
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      // Removed onChange={() => {}} as it was causing the "input is for show only" error
-                      readOnly // This explicitly tells React the input is not meant to be changed directly
+                      readOnly
                       tabIndex={-1} 
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
@@ -151,9 +154,9 @@ const NewMultiSelect = ({
           </div>
 
           {/* Selected Count */}
-          {categoryId.length > 0 && (
+          {safeCategoryId.length > 0 && (
             <div className="px-3 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
-              {categoryId.length} item{categoryId.length !== 1 ? 's' : ''} selected
+              {safeCategoryId.length} item{safeCategoryId.length !== 1 ? 's' : ''} selected
             </div>
           )}
         </div>

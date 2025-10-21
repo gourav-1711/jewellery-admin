@@ -81,11 +81,11 @@ export function Header() {
                 {result.map((item, i) => (
                   <li key={i} className="border-b-1">
                     <Link
-                      onClick={() => setBar(false) }
+                      onClick={() => setBar(false)}
                       href={item.href}
                       className=" px-4 py-2 hover:bg-gray-100 flex justify-between items-center"
                     >
-                      {item.label} <ArrowRight/>
+                      {item.label} <ArrowRight />
                     </Link>
                   </li>
                 ))}
@@ -122,8 +122,13 @@ export function Header() {
             >
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+
+              <Link href="/dashboard/profile">
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+              </Link>
+              <Link href="/dashboard/settings">
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setOpen(true)}

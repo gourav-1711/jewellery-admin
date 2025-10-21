@@ -17,7 +17,6 @@ import { Drawer } from "@/components/drawer";
 import { ExportButtons } from "@/components/export-buttons";
 import { AlertDialogUse } from "@/components/alert-dialog";
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
-import { fetchData, createItem, updateItem, deleteItem } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -119,7 +118,7 @@ export default function BannersPage() {
       setBtnLoading(true);
       try {
         await axios.put(
-          `${API_BASE}api/admin/banner/update/${editingBanner.id}`,
+          `${API_BASE}api/admin/banner/update/${editingBanner._id}`,
           formDataToSend,
           { headers: getAuthHeaders() }
         );

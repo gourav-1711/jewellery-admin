@@ -12,15 +12,56 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { Loader2, KeyRound } from "lucide-react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPasskeyDialog, setShowPasskeyDialog] = useState(false);
+  const [isVerifyingPasskey, setIsVerifyingPasskey] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
+
+  const handlePasskeySuccess = () => {
+    setShowPasskeyDialog(false);
+    if (authToken) {
+      Cookies.set("adminToken", authToken, {
+        expires: 7,
+        path: "/",
+      });
+    }
+    router.push("/dashboard");
+  };
+
+  const handlePasskeyVerification = (passkey) => {
+    setIsVerifyingPasskey(true);
+    if (passkey === process.env.NEXT_PUBLIC_PASSKEY) {
+      toast({
+        title: "Passkey verified",
+        description: "Authentication successful!",
+      });
+      handlePasskeySuccess();
+    } else {
+      toast({
+        title: "Verification failed",
+        description: "Invalid passkey",
+        variant: "destructive",
+      });
+    }
+
+    setIsVerifyingPasskey(false);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -34,17 +75,32 @@ export default function LoginPage() {
           password,
         }
       );
-      Cookies.set("adminToken", response.data._token, {
-        expires: 7,
-        path: "/",
-      });
+      console.log(response);
+
+      if (response.status !== 200) {
+        return toast({
+          title: "Login Failed",
+          description: response.data._message,
+          variant: "destructive",
+        });
+      }
+      if (!response.data._status) {
+        toast({
+          title: "Login failed",
+          description: response.data._message,
+          variant: "destructive",
+        });
+        return;
+      }
 
       toast({
         title: "Login successful",
-        description: "Welcome back!",
+        description: "Please verify your passkey to continue.",
       });
 
-      router.push("/dashboard");
+      // Store the token and show passkey dialog
+      setAuthToken(response.data._token);
+      setShowPasskeyDialog(true);
     } catch (error) {
       toast({
         title: "Login failed",
@@ -129,11 +185,65 @@ export default function LoginPage() {
               Demo Credentials:
             </p>
             <p className="text-xs font-mono text-center">
-            jewllery_walla@gmail.com / 123456
+              jewellerywalaonline@gmail.com / 123456
             </p>
           </div>
         </CardContent>
       </Card>
+
+      {/* Passkey Dialog */}
+      <Dialog open={showPasskeyDialog} onOpenChange={setShowPasskeyDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <KeyRound className="h-6 w-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">
+              Enter Passkey
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Please enter your passkey to complete the authentication process.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handlePasskeyVerification(formData.get("passkey"));
+            }}
+            className="space-y-4 mt-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="passkey">Passkey</Label>
+              <Input
+                id="passkey"
+                name="passkey"
+                type="password"
+                placeholder="Enter your passkey"
+                required
+                autoFocus
+                disabled={isVerifyingPasskey}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isVerifyingPasskey}
+            >
+              {isVerifyingPasskey ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                "Verify Passkey"
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

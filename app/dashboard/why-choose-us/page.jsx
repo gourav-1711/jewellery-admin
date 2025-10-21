@@ -7,11 +7,28 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Drawer } from "@/components/drawer";
 import { ExportButtons } from "@/components/export-buttons";
 import { AlertDialogUse } from "@/components/alert-dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Gem,
+  Award,
+  ShieldCheck,
+  Sparkles,
+  Heart,
+  Star,
+  ThumbsUp,
+  Shield,
+  CheckCircle,
+  Gift,
+  Sparkle,
+} from "lucide-react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
@@ -35,25 +52,31 @@ export default function WhyChooseUsPage() {
   const [editingWhyChooseUs, setEditingWhyChooseUs] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [whyChooseUsToDelete, setWhyChooseUsToDelete] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedIcon, setSelectedIcon] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    image: "",
+    icon: "",
   });
+
+  const availableIcons = [
+    { name: "Gem", component: Gem, color: "#8b5cf6" },
+    { name: "Award", component: Award, color: "#f59e0b" },
+    { name: "ShieldCheck", component: ShieldCheck, color: "#10b981" },
+    { name: "Sparkles", component: Sparkles, color: "#ec4899" },
+    { name: "Heart", component: Heart, color: "#ef4444" },
+    { name: "Star", component: Star, color: "#f59e0b" },
+    { name: "ThumbsUp", component: ThumbsUp, color: "#3b82f6" },
+    { name: "Shield", component: Shield, color: "#8b5cf6" },
+    { name: "CheckCircle", component: CheckCircle, color: "#10b981" },
+    { name: "Gift", component: Gift, color: "#ec4899" },
+    { name: "Sparkle", component: Sparkle, color: "#f59e0b" },
+  ];
   const { toast } = useToast();
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData({ ...formData, image: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setFormData({ ...formData, image: file });
-    }
+  const handleIconSelect = (icon) => {
+    setSelectedIcon(icon);
+    setFormData({ ...formData, icon: icon.name });
   };
 
   useEffect(() => {
@@ -88,8 +111,19 @@ export default function WhyChooseUsPage() {
     setFormData({
       title: whyChooseUs.title,
       description: whyChooseUs.description,
-      image: whyChooseUs.image,
+      icon: whyChooseUs.icon || "",
     });
+
+    // Find and set the selected icon if it exists
+    if (whyChooseUs.icon) {
+      const icon = availableIcons.find((i) => i.name === whyChooseUs.icon);
+      if (icon) {
+        setSelectedIcon(icon);
+      }
+    } else {
+      setSelectedIcon(null);
+    }
+
     setDrawerOpen(true);
   };
 
@@ -102,11 +136,20 @@ export default function WhyChooseUsPage() {
     if (!whyChooseUsToDelete) return;
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `${API_BASE}api/admin/whyChooseUs/delete/${whyChooseUsToDelete}`,
         { id: whyChooseUsToDelete },
         { headers: getAuthHeaders() }
       );
+      if (!response.data._status) {
+        toast({
+          title: "Error deleting Why Choose Us",
+          description:
+            response.data._message || "Failed to delete Why Choose Us",
+          variant: "destructive",
+        });
+        return;
+      }
       loadWhyChooseUs();
       toast({ title: "Why Choose Us deleted successfully" });
     } catch (error) {
@@ -124,19 +167,37 @@ export default function WhyChooseUsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedIcon) {
+      toast({
+        title: "Please select an icon",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const submitData = new FormData();
     submitData.append("title", formData.title);
     submitData.append("description", formData.description);
-    submitData.append("image", formData.image);
+    submitData.append("icon", formData.icon);
+    submitData.append("image", formData.icon);
 
     if (editingWhyChooseUs) {
       setBtnLoading(true);
       try {
-        await axios.put(
+        const response = await axios.put(
           `${API_BASE}api/admin/whyChooseUs/update/${editingWhyChooseUs._id}`,
           submitData,
           { headers: getAuthHeaders() }
         );
+        if (!response.data._status) {
+          toast({
+            title: "Error updating Why Choose Us",
+            description:
+              response.data._message || "Failed to update Why Choose Us",
+            variant: "destructive",
+          });
+          return;
+        }
         loadWhyChooseUs();
         toast({ title: "Why Choose Us updated successfully" });
       } catch (error) {
@@ -152,13 +213,22 @@ export default function WhyChooseUsPage() {
     } else {
       setBtnLoading(true);
       try {
-        await axios.post(
+        const response = await axios.post(
           `${API_BASE}api/admin/whyChooseUs/create`,
           submitData,
           {
             headers: getAuthHeaders(),
           }
         );
+        if (!response.data._status) {
+          toast({
+            title: "Error creating Why Choose Us",
+            description:
+              response.data._message || "Failed to create Why Choose Us",
+            variant: "destructive",
+          });
+          return;
+        }
         toast({ title: "Why Choose Us created successfully" });
         loadWhyChooseUs();
       } catch (error) {
@@ -175,20 +245,24 @@ export default function WhyChooseUsPage() {
 
     setDrawerOpen(false);
     setEditingWhyChooseUs(null);
-    setFormData({
-      title: "",
-      description: "",
-      image: "",
-    });
   };
 
   const changeStatus = async (whyChooseUs) => {
     try {
-      await axios.put(
+      const response = await axios.put(
         `${API_BASE}api/admin/whyChooseUs/change-status/${whyChooseUs._id}`,
         { id: whyChooseUs._id },
         { headers: getAuthHeaders() }
       );
+      if (!response.data._status) {
+        toast({
+          title: "Error updating Why Choose Us status",
+          description:
+            response.data._message || "Failed to update status",
+          variant: "destructive",
+        });
+        return;
+      }
       loadWhyChooseUs();
       toast({
         title: `why Choose Us ${
@@ -235,8 +309,9 @@ export default function WhyChooseUsPage() {
               setFormData({
                 title: "",
                 description: "",
-                image: "",
+                icon: "",
               });
+              setSelectedIcon(null);
               setDrawerOpen(true);
             }}
             className="transition-all duration-200 hover:scale-105"
@@ -257,15 +332,15 @@ export default function WhyChooseUsPage() {
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex flex-col items-center gap-3">
-                  <Avatar className="size-24 ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/50">
-                    <AvatarImage
-                      src={whyChooseUs.image || "/placeholder.svg"}
-                      alt={whyChooseUs.title}
-                    />
-                    <AvatarFallback>
-                      {whyChooseUs.title.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="size-24 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/50">
+                    {(() => {
+                      const Icon =
+                        availableIcons.find(
+                          (icon) => icon.name === whyChooseUs.image
+                        )?.component || Gem;
+                      return <Icon className="h-12 w-12 text-primary" />;
+                    })()}
+                  </div>
                   <div>
                     <h3 className="font-semibold">{whyChooseUs.title}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -354,35 +429,60 @@ export default function WhyChooseUsPage() {
           </div>
 
           <div className="space-y-2 animate-in slide-in-from-right duration-300 delay-150">
-            <Label>Image *</Label>
-            <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="h-full w-full object-contain p-2"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <ImageIcon className="w-8 h-8 mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground text-center px-4">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      SVG, PNG, or JPG (MAX. 2MB)
-                    </p>
-                  </div>
-                )}
-                <input
-                  id="logo-upload"
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </label>
+            <Label>Select an Icon *</Label>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+              {availableIcons.map((icon) => {
+                const Icon = icon.component;
+                const isSelected = selectedIcon?.name === icon.name;
+                return (
+                  <button
+                    key={icon.name}
+                    type="button"
+                    onClick={() => handleIconSelect(icon)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all duration-200 ${
+                      isSelected
+                        ? "border-primary bg-primary/10"
+                        : "border-muted-foreground/20 hover:border-primary/50 hover:bg-muted/50"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-6 w-6 mb-1 ${
+                        isSelected ? "text-primary" : "text-muted-foreground"
+                      }`}
+                      style={{ color: isSelected ? icon.color : undefined }}
+                    />
+                    {/* <span className="text-xs text-muted-foreground">
+                      {icon.name}
+                    </span> */}
+                  </button>
+                );
+              })}
             </div>
+            {selectedIcon && (
+              <div className="mt-4 p-4 border rounded-lg bg-muted/20 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Selected Icon:
+                  </p>
+                  <div className="flex items-center justify-center">
+                    <div className="p-4 rounded-full bg-primary/10">
+                      {(() => {
+                        const Icon = selectedIcon.component;
+                        return (
+                          <Icon
+                            className="h-8 w-8 text-primary"
+                            style={{ color: selectedIcon.color }}
+                          />
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <p className="mt-2 text-sm font-medium">
+                    {selectedIcon.name}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <Button
@@ -390,11 +490,15 @@ export default function WhyChooseUsPage() {
             type="submit"
             className="w-full animate-in slide-in-from-bottom duration-300 delay-200"
           >
-            {btnLoading
-              ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading...</>)
-              : editingWhyChooseUs
-              ? "Update Why Choose Us"
-              : "Create Why Choose Us"}
+            {btnLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading...
+              </>
+            ) : editingWhyChooseUs ? (
+              "Update Why Choose Us"
+            ) : (
+              "Create Why Choose Us"
+            )}
           </Button>
         </form>
       </Drawer>

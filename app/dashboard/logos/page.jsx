@@ -144,7 +144,7 @@ export default function LogosPage() {
 
     try {
       await axios.put(
-        `${API_BASE}api/admin/logo/destroy`,
+        `${API_BASE}api/admin/logo/destroy/${logoToDelete}`,
         { id: logoToDelete },
         { headers: getAuthHeaders() }
       );
@@ -315,7 +315,7 @@ export default function LogosPage() {
                         Click to upload or drag and drop
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        SVG, PNG, or JPG (MAX. 2MB)
+                        SVG, PNG, or JPG (MAX. 5MB)
                       </p>
                     </div>
                   )}
