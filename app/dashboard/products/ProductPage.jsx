@@ -154,11 +154,14 @@ export default function ProductsPage() {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}api/admin/product/view?showDeleted=true`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({}),
-      });
+      const response = await fetch(
+        `${API_BASE}api/admin/product/view?showDeleted=true`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({}),
+        }
+      );
       const data = await response.json();
       setProducts(data._data || []);
     } catch (error) {
@@ -295,17 +298,32 @@ export default function ProductsPage() {
           body: JSON.stringify({ id: deleteId }),
         }
       );
-      if (!response.ok) throw new Error("Failed to delete");
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message || errorData.error || "Failed to delete product";
+        throw new Error(errorMessage);
+      }
+
       toast({ title: "Product deleted successfully" });
       loadProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast({ title: "Error deleting product", variant: "destructive" });
+      const errorMessage =
+        error.message ||
+        "An unexpected error occurred while deleting the product";
+      toast({
+        title: "Error deleting product",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setAlertOpen(false);
       setDeleteId(null);
     }
   };
+
   function generateCode() {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
@@ -397,7 +415,14 @@ export default function ProductsPage() {
         body: formDataToSend,
       });
 
-      if (!response.ok) throw new Error("Failed to save product");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message ||
+          errorData.error ||
+          `Failed to ${editingProduct ? "update" : "create"} product`;
+        throw new Error(errorMessage);
+      }
 
       toast({
         title: `Product ${editingProduct ? "updated" : "created"} successfully`,
@@ -406,16 +431,18 @@ export default function ProductsPage() {
       loadProducts();
     } catch (error) {
       console.error("Error saving product:", error);
+      const errorMessage =
+        error.message ||
+        "An unexpected error occurred while saving the product";
       toast({
         title: "Error saving product",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
       setBtnLoading(false);
     }
   };
-
   const closeDrawer = () => {
     setDrawerOpen(false);
     setEditingProduct(null);
@@ -425,7 +452,6 @@ export default function ProductsPage() {
     setSelectedColors([]);
     setSelectedMaterials([]);
     setFormData(INITIAL_FORM_STATE);
-
   };
 
   const handleMainImageChange = (e) => {
