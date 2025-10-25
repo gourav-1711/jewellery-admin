@@ -154,7 +154,7 @@ export default function ProductsPage() {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}api/admin/product/view`, {
+      const response = await fetch(`${API_BASE}api/admin/product/view?showDeleted=true`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({}),

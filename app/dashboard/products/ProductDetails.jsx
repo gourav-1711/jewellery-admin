@@ -160,6 +160,16 @@ export default function ProductDetails({ product }) {
               </span>
             </div>
           </div>
+          {
+            product.slug && (
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Slug</h3>
+                <p className="mt-1 text-sm text-gray-600 flex items-center">
+                  <Tag className="w-4 h-4 mr-2" /> {product.slug}
+                </p>
+              </div>
+            )
+          }
 
           <div className="space-y-2">
             <div className="flex items-baseline space-x-3">
