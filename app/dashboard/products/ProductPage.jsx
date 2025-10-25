@@ -20,8 +20,7 @@ import { useRouter } from "next/navigation";
 const INITIAL_FORM_STATE = {
   name: "",
   description: "",
-  short_description: "",
-  dimensions: "",
+  purity: "",
   code: "",
   price: "",
   discount_price: "",
@@ -187,11 +186,11 @@ export default function ProductsPage() {
       name: "",
       price: 0,
       stock: 0,
-      dimensions: "",
+      purity: "",
       code: "",
       discount_price: 0,
       description: "",
-      short_description: "",
+
       estimated_delivery_time: "",
       status: true,
       isFeatured: false,
@@ -219,11 +218,10 @@ export default function ProductsPage() {
       name: defaultProduct.name,
       price: defaultProduct.price,
       stock: defaultProduct.stock,
-      dimensions: defaultProduct.dimensions,
+      purity: defaultProduct.purity,
       code: defaultProduct.code,
       discount_price: defaultProduct.discount_price,
       description: defaultProduct.description,
-      short_description: defaultProduct.short_description,
       estimated_delivery_time: defaultProduct.estimated_delivery_time,
       status: defaultProduct.status,
       isFeatured: defaultProduct.isFeatured,
@@ -341,8 +339,7 @@ export default function ProductsPage() {
     // Add text fields
     formDataToSend.append("name", formData.name);
     formDataToSend.append("description", formData.description);
-    formDataToSend.append("short_description", formData.short_description);
-    formDataToSend.append("dimensions", formData.dimensions);
+    formDataToSend.append("purity", formData.purity);
 
     formDataToSend.append(
       "code",
@@ -812,14 +809,14 @@ export default function ProductsPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Additional Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Dimensions */}
+              {/* Purity */}
               <div className="space-y-2">
-                <Label htmlFor="dimensions">Dimensions *</Label>
+                <Label htmlFor="purity">Purity *</Label>
                 <Input
-                  id="dimensions"
-                  value={formData.dimensions}
+                  id="purity"
+                  value={formData.purity}
                   onChange={(e) =>
-                    setFormData({ ...formData, dimensions: e.target.value })
+                    setFormData({ ...formData, purity: e.target.value })
                   }
                   placeholder="e.g., 10x10x5 cm"
                   required
